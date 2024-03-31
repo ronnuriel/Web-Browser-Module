@@ -6,6 +6,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+# # Path to ChromeDriver on M1 Mac
+# chromedriver_path = "/opt/homebrew/bin/chromedriver"
+
+
+chromedriver_path = "/usr/bin/chromedriver"
 
 def get_network_resources(driver):
     logs = driver.get_log("performance")
@@ -39,8 +44,6 @@ def main(input_dir="./input", output_dir="./output"):
     # caps = options.to_capabilities()
     # caps["goog:loggingPrefs"] = {"performance": "ALL"}
 
-
-
     # Set up Chrome options
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
@@ -51,11 +54,10 @@ def main(input_dir="./input", output_dir="./output"):
     caps = chrome_options.to_capabilities()
     caps["goog:loggingPrefs"] = {"performance": "ALL"}
     # Specify the direct path to chromedriver (no need to use WebDriverManager)
-    service = Service(executable_path="/usr/bin/chromedriver")
+    service = Service(executable_path=chromedriver_path)
 
     # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
-
 
     # Start Chrome Driver
     # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options,
