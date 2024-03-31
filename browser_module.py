@@ -6,11 +6,21 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-# # Path to ChromeDriver on M1 Mac
-# chromedriver_path = "/opt/homebrew/bin/chromedriver"
+import platform
 
-
+# Initialize chromedriver_path with a default value
 chromedriver_path = "/usr/bin/chromedriver"
+
+# Detect the platform/machine type
+machine_type = platform.machine()
+
+if machine_type == 'arm64':  # For M1/M2 Mac
+    chromedriver_path = "/opt/homebrew/bin/chromedriver"
+elif machine_type == 'x86_64':  # For Intel Mac and possibly many Linux distros
+    # This is already set as default, but you can adjust it if necessary
+    chromedriver_path = "/usr/bin/chromedriver"
+# Add more conditional branches if needed, for example, for Windows or other specific setups
+
 
 def get_network_resources(driver):
     logs = driver.get_log("performance")
@@ -33,35 +43,20 @@ def main(input_dir="./input", output_dir="./output"):
     with open(os.path.join(input_dir, "urls.input"), "r") as file:
         urls = file.read().splitlines()
 
-    # Set Chrome options for headlehometaskss browsing and enable performance logging
-    # options = Options()
-    # options.headless = True
-    # options.add_argument("--no-sandbox")
-    # options.add_argument("--disable-dev-shm-usage")
-    # options.add_argument('--headless')
-    # options.add_experimental_option("w3c", False)
-    # options.add_experimental_option("perfLoggingPrefs", {"enableNetwork": True})
-    # caps = options.to_capabilities()
-    # caps["goog:loggingPrefs"] = {"performance": "ALL"}
-
     # Set up Chrome options
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    # chrome_options.binary_location = "/usr/bin/chromium"  # Path to Chromium
     caps = chrome_options.to_capabilities()
     caps["goog:loggingPrefs"] = {"performance": "ALL"}
+
     # Specify the direct path to chromedriver (no need to use WebDriverManager)
     service = Service(executable_path=chromedriver_path)
 
     # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    # Start Chrome Driver
-    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options,
-    #                           desired_capabilities=caps)
 
     for index, url in enumerate(urls, start=1):
         driver.get(url)
