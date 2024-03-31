@@ -21,12 +21,12 @@ def get_network_resources(driver):
                 pass  # Skip entries without response details
     return resources
 
-def main(input_dir="/input", output_dir="/output"):
+def main(input_dir="./input", output_dir="./output"):
     # Read URLs from input file
     with open(os.path.join(input_dir, "urls.input"), "r") as file:
         urls = file.read().splitlines()
 
-    # Set Chrome options for headless browsing and enable performance logging
+    # Set Chrome options for headlehometaskss browsing and enable performance logging
     options = Options()
     options.headless = True
     options.add_argument("--no-sandbox")
