@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+
 def get_network_resources(driver):
     logs = driver.get_log("performance")
     resources = []
@@ -21,23 +22,44 @@ def get_network_resources(driver):
                 pass  # Skip entries without response details
     return resources
 
+
 def main(input_dir="./input", output_dir="./output"):
     # Read URLs from input file
     with open(os.path.join(input_dir, "urls.input"), "r") as file:
         urls = file.read().splitlines()
 
     # Set Chrome options for headlehometaskss browsing and enable performance logging
-    options = Options()
-    options.headless = True
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_experimental_option("w3c", False)
-    options.add_experimental_option("perfLoggingPrefs", {"enableNetwork": True})
-    caps = options.to_capabilities()
+    # options = Options()
+    # options.headless = True
+    # options.add_argument("--no-sandbox")
+    # options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument('--headless')
+    # options.add_experimental_option("w3c", False)
+    # options.add_experimental_option("perfLoggingPrefs", {"enableNetwork": True})
+    # caps = options.to_capabilities()
+    # caps["goog:loggingPrefs"] = {"performance": "ALL"}
+
+
+
+    # Set up Chrome options
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    # chrome_options.binary_location = "/usr/bin/chromium"  # Path to Chromium
+    caps = chrome_options.to_capabilities()
     caps["goog:loggingPrefs"] = {"performance": "ALL"}
+    # Specify the direct path to chromedriver (no need to use WebDriverManager)
+    service = Service(executable_path="/usr/bin/chromedriver")
+
+    # Initialize the WebDriver
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
 
     # Start Chrome Driver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options, desired_capabilities=caps)
+    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options,
+    #                           desired_capabilities=caps)
 
     for index, url in enumerate(urls, start=1):
         driver.get(url)
@@ -70,6 +92,7 @@ def main(input_dir="./input", output_dir="./output"):
             json.dump(output_data, json_file)
 
     driver.quit()
+
 
 if __name__ == "__main__":
     main()
