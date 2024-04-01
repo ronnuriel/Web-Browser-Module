@@ -1,5 +1,5 @@
 import pytest
-from browser_module import get_network_resources  # Adjust this import based on your actual script name and location
+from browser_module import get_network_resources
 
 
 @pytest.fixture
