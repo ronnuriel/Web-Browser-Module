@@ -5,7 +5,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 import platform
 
-# Initialize chromedriver_path with a default value
 chromedriver_path = "/usr/bin/chromedriver"
 
 # Detect the platform/machine type
@@ -51,6 +50,7 @@ def main(input_dir="./input", output_dir="./output"):
 
     # Convert options to capabilities and modify them to include performance logging
     caps = chrome_options.to_capabilities()
+    # Enable performance logging
     caps["goog:loggingPrefs"] = {"performance": "ALL"}
 
     # Specify the direct path to chromedriver (no need to use WebDriverManager)
@@ -76,7 +76,7 @@ def main(input_dir="./input", output_dir="./output"):
         screenshot_path = os.path.join(url_dir, "screenshot.png")
         driver.save_screenshot(screenshot_path)
 
-        # Encode screenshot in base64 for Part 4
+        # Part 4: Encode screenshot in base64
         with open(screenshot_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
 
