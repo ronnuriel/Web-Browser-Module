@@ -15,7 +15,7 @@ Run Docker container linux or mac
 ./run.sh
 ```
 Run Docker container windows
-```
+```bash
 ./run.ps1
 ```
 
