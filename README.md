@@ -35,6 +35,12 @@ python browser_module.py
 '
 ```
 
+clean output directory
+```bash
+rm -rf output/*
+```
+
+
 ## **Run Tests**
 ```bash
 python -m pytest testMain.py
