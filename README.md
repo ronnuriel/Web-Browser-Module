@@ -10,10 +10,15 @@ git clone https://github.com/ronnuriel/Cycognito.git
 cd Cycognito
 ```
 
-Run Docker container
+Run Docker container linux or mac
 ```bash
 ./run.sh
 ```
+Run Docker container windows
+```
+./run.ps1
+```
+
 if you have permission issues, run the following command
 ```bash
 chmod +x run.sh
