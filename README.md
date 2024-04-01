@@ -30,7 +30,6 @@ python browser_module.py
 .
 ├── Dockerfile                 # Dockerfile for containerizing the application.
 ├── README.md                  # This README file.
-├── __pycache__                # Compiled Python files (automatically generated).
 ├── browser_module.py          # Main Python script for web scraping.
 ├── input                      # Directory containing input files.
 │   └── urls.input             # Text file with URLs to scrape.
