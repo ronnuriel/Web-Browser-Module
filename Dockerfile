@@ -22,12 +22,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
 # Environment variables to specify Chromium and ChromeDriver paths
 ENV CHROMIUM_PATH=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
 # Run your script when the container launches
-CMD ["/bin/bash"]
+CMD ["python", "browser_module.py"]
+
+# Start a bash shell when the container launches
+#CMD ["/bin/bash"]

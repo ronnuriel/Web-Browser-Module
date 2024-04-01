@@ -14,6 +14,10 @@ Run Docker container
 ```bash
 ./run.sh
 ```
+if you have permission issues, run the following command
+```bash
+chmod +x run.sh
+```
 
 Run the application without Docker
 ```bash

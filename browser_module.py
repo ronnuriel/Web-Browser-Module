@@ -60,6 +60,7 @@ def main(input_dir="./input", output_dir="./output"):
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     for index, url in enumerate(urls, start=1):
+        print(f"Processing URL {index}: {url}")
         driver.get(url)
 
         # Create directory for the URL
