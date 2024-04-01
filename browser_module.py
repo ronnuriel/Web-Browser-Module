@@ -17,9 +17,6 @@ elif machine_type == 'x86_64':  # For Intel Mac and possibly many Linux distros
     chromedriver_path = "/usr/bin/chromedriver"
 
 
-# Add more conditional branches if needed, for example, for Windows or other specific setups
-
-
 def get_network_resources(driver):
     logs = driver.get_log("performance")
     resources = []
@@ -90,7 +87,9 @@ def main(input_dir="./input", output_dir="./output"):
         with open(os.path.join(url_dir, "browse.json"), "w") as json_file:
             json.dump(output_data, json_file, indent=4)
 
+    # Quit the WebDriver
     driver.quit()
+    print("All URLs processed successfully. output files are saved in the output directory.")
 
 
 if __name__ == "__main__":
