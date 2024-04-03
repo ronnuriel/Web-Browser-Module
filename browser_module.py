@@ -97,7 +97,6 @@ def main():
                          enumerate(urls)}
         for future in as_completed(future_to_url):
             url = future_to_url[future]
-            print(f"Processing of URL {url} is complete.")
             try:
                 data = future.result()
             except Exception as exc:
