@@ -5,6 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 import platform
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import argparse
+
 
 chromedriver_path = "/usr/bin/chromedriver"
 
@@ -79,14 +81,23 @@ def process_url(url, index, output_dir="./output"):
     driver.quit()
 
 
-def main(input_dir="./input", output_dir="./output", max_workers=5):
-    with open(os.path.join(input_dir, "urls.input"), "r") as file:
+def main():
+    parser = argparse.ArgumentParser(description="Run web scraper with multiple workers.")
+    parser.add_argument('--workers', type=int, default=5, help='Number of workers for parallel processing')
+    parser.add_argument('--input_dir', type=str, default="./input", help='Directory containing input URLs')
+    parser.add_argument('--output_dir', type=str, default="./output", help='Directory to save the output')
+
+    args = parser.parse_args()
+
+    with open(os.path.join(args.input_dir, "urls.input"), "r") as file:
         urls = file.read().splitlines()
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_url = {executor.submit(process_url, url, index+1, output_dir): url for index, url in enumerate(urls)}
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        future_to_url = {executor.submit(process_url, url, index + 1, args.output_dir): url for index, url in
+                         enumerate(urls)}
         for future in as_completed(future_to_url):
             url = future_to_url[future]
+            print(f"Processing of URL {url} is complete.")
             try:
                 data = future.result()
             except Exception as exc:
@@ -97,3 +108,4 @@ def main(input_dir="./input", output_dir="./output", max_workers=5):
 
 if __name__ == "__main__":
     main()
+
