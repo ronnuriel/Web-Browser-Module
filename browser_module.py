@@ -4,6 +4,9 @@ import base64
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 import platform
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import argparse
+
 
 chromedriver_path = "/usr/bin/chromedriver"
 
@@ -13,7 +16,6 @@ machine_type = platform.machine()
 if machine_type == 'arm64':  # For M1/M2 Mac
     chromedriver_path = "/opt/homebrew/bin/chromedriver"
 elif machine_type == 'x86_64':  # For Intel Mac and possibly many Linux distros
-    # This is already set as default, but you can adjust it if necessary
     chromedriver_path = "/usr/bin/chromedriver"
 
 
@@ -33,64 +35,76 @@ def get_network_resources(driver):
     return resources
 
 
-def main(input_dir="./input", output_dir="./output"):
-    # Read URLs from input file
-    with open(os.path.join(input_dir, "urls.input"), "r") as file:
-        urls = file.read().splitlines()
-
-    # Set up Chrome options
+def process_url(url, index, output_dir="./output"):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # Convert options to capabilities and modify them to include performance logging
     caps = chrome_options.to_capabilities()
-    # Enable performance logging
     caps["goog:loggingPrefs"] = {"performance": "ALL"}
 
-    # Specify the direct path to chromedriver (no need to use WebDriverManager)
     service = Service(executable_path=chromedriver_path)
 
-    # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
+    print(f"Processing URL {index}: {url}")
+    driver.get(url)
 
-    for index, url in enumerate(urls, start=1):
-        print(f"Processing URL {index}: {url}")
-        driver.get(url)
+    # Create directory for the URL
+    url_dir = os.path.join(output_dir, f"url_{index}")
+    os.makedirs(url_dir, exist_ok=True)
 
-        # Create directory for the URL
-        url_dir = os.path.join(output_dir, f"url_{index}")
-        os.makedirs(url_dir, exist_ok=True)
+    # Part 1: Save HTML content
+    html_content = driver.page_source
 
-        # Part 1: Save HTML content
-        html_content = driver.page_source
+    # Part 2: Save network resources
+    resources = get_network_resources(driver)
 
-        # Part 2: Save network resources
-        resources = get_network_resources(driver)
+    # Part 3: Save screenshot
+    screenshot_path = os.path.join(url_dir, "screenshot.png")
+    driver.save_screenshot(screenshot_path)
 
-        # Part 3: Save screenshot
-        screenshot_path = os.path.join(url_dir, "screenshot.png")
-        driver.save_screenshot(screenshot_path)
+    # Part 4: Encode screenshot in base64
+    with open(screenshot_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
 
-        # Part 4: Encode screenshot in base64
-        with open(screenshot_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    # Save output JSON
+    output_data = {
+        "html": html_content,
+        "resources": resources,
+        "screenshot": encoded_string
+    }
+    with open(os.path.join(url_dir, "browse.json"), "w") as json_file:
+        json.dump(output_data, json_file, indent=4)
 
-        # Save output JSON
-        output_data = {
-            "html": html_content,
-            "resources": resources,
-            "screenshot": encoded_string
-        }
-        with open(os.path.join(url_dir, "browse.json"), "w") as json_file:
-            json.dump(output_data, json_file, indent=4)
-
-    # Quit the WebDriver
     driver.quit()
-    print("All URLs processed successfully. output files are saved in the output directory.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run web scraper with multiple workers.")
+    parser.add_argument('--workers', type=int, default=5, help='Number of workers for parallel processing')
+    parser.add_argument('--input_dir', type=str, default="./input", help='Directory containing input URLs')
+    parser.add_argument('--output_dir', type=str, default="./output", help='Directory to save the output')
+
+    args = parser.parse_args()
+
+    with open(os.path.join(args.input_dir, "urls.input"), "r") as file:
+        urls = file.read().splitlines()
+
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        future_to_url = {executor.submit(process_url, url, index + 1, args.output_dir): url for index, url in
+                         enumerate(urls)}
+        for future in as_completed(future_to_url):
+            url = future_to_url[future]
+            try:
+                data = future.result()
+            except Exception as exc:
+                print(f'{url} generated an exception: {exc}')
+
+    print("All URLs processed successfully. Output files are saved in the output directory.")
 
 
 if __name__ == "__main__":
     main()
+
