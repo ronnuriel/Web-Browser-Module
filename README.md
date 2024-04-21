@@ -4,9 +4,6 @@ Web scraping tool that extracts data from a list of URLs.
 The tool uses the Selenium WebDriver to scrape the data and save it in a JSON file.
 The tool also takes a screenshot of the URL and saves it as a PNG file.
 
-([Web Browser Home Task.pdf](https://github.com/ronnuriel/Cycognito/blob/main/Web%20Browser%20Home%20Task.pdf))
-
-
 # Installation
 ```bash
 git clone https://github.com/ronnuriel/Cycognito.git
