@@ -1,4 +1,4 @@
-# Cycognito - Task
+# Web scraping tool
 
 Web scraping tool that extracts data from a list of URLs.
 The tool uses the Selenium WebDriver to scrape the data and save it in a JSON file.
@@ -6,8 +6,8 @@ The tool also takes a screenshot of the URL and saves it as a PNG file.
 
 # Installation
 ```bash
-git clone https://github.com/ronnuriel/Cycognito.git
-cd Cycognito
+git clone https://github.com/ronnuriel/Web-Browser-Module.git
+cd Web-Browser-Module
 ```
 
 Run Docker container linux or mac
